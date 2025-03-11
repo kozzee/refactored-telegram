@@ -1,0 +1,5 @@
+flask
+aiogram
+python-dotenv
+gigachat
+asyncio

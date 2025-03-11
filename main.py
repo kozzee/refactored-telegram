@@ -4,13 +4,19 @@ from aiogram.filters import Filter
 from aiogram.types import Message, InputMediaPhoto, InputFile
 from aiogram.filters import CommandStart
 from aiogram.types import InputMediaPhoto, File
+import threading
 from gigachat import GigaChat
+from dotenv import load_dotenv
+from server import run as run_flask
 #import re
 import os
 
+load_dotenv()
+
 # Токены ботов
-API_TOKEN = os.getenv('BOT_TOKEN')
-CHANNEL_ID = "CHANEL_ID"                                   
+BOT_TOKEN = os.getenv('BOT_TOKEN')
+CHANNEL_ID = os.getenv("CHANEL_ID")   
+API_TOKEN = os.getenv('API_TOKEN')                     
 
 PROMPT = '''Прошу тебя выступить в роли профессионального копирайтера и переосмыслить предоставленный текст, используя синонимы, чтобы создать уникальную версию, в которой используется естественный стиль. 
             Пожалуйста, сохраните исходное форматирование и смысл текста, придерживаясь красивого литературного языка и избегая стилистических и грамматических ошибок. 
@@ -19,7 +25,7 @@ PROMPT = '''Прошу тебя выступить в роли професси�
             Пожалуйста, обеспечь высокую сложность и разнообразие контента, чтобы избежать повторов и успешно пройти проверку на уникальность. Также не используй приветственные слова - сразу исправленный текст без форматирования'''
 
 # Инициализация бота и диспетчера
-bot = Bot(token=API_TOKEN)
+bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
 # class IsForwarded(Filter):
@@ -107,5 +113,14 @@ async def handle_forwarded_message(message: types.Message):
 
 
 
+
 if __name__ == '__main__':
-    asyncio.run(dp.start_polling(bot))
+    # Запускаем Flask в отдельном потоке
+    flask_thread = threading.Thread(target=run_flask, daemon=True)
+    flask_thread.start()
+
+    # Запускаем бота
+    try:
+        asyncio.run(dp.start_polling(bot))
+    except (KeyboardInterrupt, SystemExit):
+        print('Бот остановлен!')
