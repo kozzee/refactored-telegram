@@ -99,7 +99,7 @@ async def photo_handler(message: types.Message):
 async def video_handler(message: types.Message):
     edited_text = await rephrase_text(message.caption)
     # await message.answer_video(
-    #     video=message.video.file_id,
+    #     video=message.video.file_id, 
     #     caption=edited_text
     # )
     await bot.send_video(CHANNEL_ID, message.video.file_id, caption=edited_text)
